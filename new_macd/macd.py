@@ -205,6 +205,7 @@ class MACD:
         level_1_data=[]
         trunk_data=[]
         ranger_1=[]
+        main_results=[]
         ranger_2=[]
         for x in master_close_list:
             main_datas=master_close_list.index(x)
@@ -232,10 +233,21 @@ class MACD:
                 ma=max(rangers)
                 ranger_2.append(ma)
             results=[j-v/w-v for j,v,w in zip(trunk_data,ranger_1,ranger_2)]
-            print(results)
-
-
+            main_results=results
             
+            for ind ,intialized_k in enumerate(main_results):
+                main_data[ind+3]['K']=intialized_k
+
+            with open(r"C:\Users\dasho\divergence_test.json",'w') as ee:
+                json.dump(main_data,ee,indent=4)
+        
+
+
+
+
+
+
+
 
         
         
