@@ -200,27 +200,42 @@ class MACD:
 
 
         ##### STOCHIATIC VALUES 
+        main_list=[]
+        revised_datas=[]
+        level_1_data=[]
+        trunk_data=[]
+        ranger_1=[]
+        ranger_2=[]
+        for x in master_close_list:
+            main_datas=master_close_list.index(x)
+            if main_datas not in main_list:
+                main_list.append(main_datas)
+            if main_datas in main_list:
+                values=main_list[-1]
+                new_index_value=values+1
+                main_list.append(new_index_value)
+        original_list_length=len(master_close_list)
+        new_list_length=len(main_list)
+        if new_list_length>original_list_length:
+            new_revised_list=main_list[0:new_list_length-1]
+            for value_finding in new_revised_list:
+                value_finder=master_close_list[value_finding]
+                revised_datas.append(value_finder)
+            for t in new_revised_list[3:]:
+                trunk_data.append(t)
+                required_values=t-3
+                level_1_data.append(required_values)
+            for a,b in zip(level_1_data,trunk_data):
+                rangers=master_close_list[a:b]
+                mi=min(rangers)
+                ranger_1.append(mi)
+                ma=max(rangers)
+                ranger_2.append(ma)
+            results=[j-v/w-v for j,v,w in zip(trunk_data,ranger_1,ranger_2)]
+            print(results)
 
 
-
-        tera_close=[]
-        tera_high=[]
-        tera_low=[]
-        max_high_value=
-        
-
-
-        for data in main_data[6:]:
-            close_prices=data['CLOSE']
-            low_prices=data['LOW']
-            high_prices=data['HIGH']
-            tera_high.append(high_prices)
-            tera_low.append(low_prices)
-            max_high=max(tera_high)
-
-            max_low=min(tera_low)
-
-        
+            
 
         
         
