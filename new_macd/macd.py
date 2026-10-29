@@ -207,6 +207,7 @@ class MACD:
         ranger_1=[]
         main_results=[]
         ranger_2=[]
+        master_absolute=[]
         for x in master_close_list:
             main_datas=master_close_list.index(x)
             if main_datas not in main_list:
@@ -234,12 +235,130 @@ class MACD:
                 ranger_2.append(ma)
             results=[j-v/w-v for j,v,w in zip(trunk_data,ranger_1,ranger_2)]
             main_results=results
+            for rev in main_results:
+                absolute_values=abs(rev)
+                master_absolute.append(absolute_values)
+
             
-            for ind ,intialized_k in enumerate(main_results):
+            for ind ,intialized_k in enumerate(master_absolute):
                 main_data[ind+3]['K']=intialized_k
 
             with open(r"C:\Users\dasho\divergence_test.json",'w') as ee:
                 json.dump(main_data,ee,indent=4)
+
+        #### SMOOTHED K
+        k_holder=[]
+        index_loader=[]
+        finalized_values=[]
+        dummy_index=[]
+        for k in main_data[3:]:
+            initialized_k=k['K']
+            k_holder.append(initialized_k)
+        for avg_k in k_holder:
+            index_finder=k_holder.index(avg_k)
+            if index_finder not in index_loader:
+                index_loader.append(index_finder)
+            if index_finder in index_loader:
+                main_values=index_loader[-1]
+                new_values=main_values+1
+                index_loader.append(new_values)
+            new_length=len(index_loader)
+            ranger_data=index_loader[0:new_length-1]
+        for data in ranger_data:
+            required_datas=data-3
+            dummy_index.append(required_datas)
+        dummy_index.reverse()
+        ranger_data.reverse()
+
+
+        for j,u in zip(dummy_index,ranger_data):
+            place_holder=sum(k_holder[j:u])
+            finalized_values.append(place_holder)
+       
+        for i ,averaged_k in enumerate(finalized_values):
+            main_data[i+3]['AVG_K']=averaged_k
+
+        with open(r"C:\Users\dasho\divergence_test.json",'w') as oo:
+            json.dump(main_data,oo,indent=4)
+
+
+
+        #INITIALIZED_D
+        avg_k_holder=[]
+        index_loader_=[]
+        final_values=[]
+        dummy_index_=[]
+
+
+
+        for d in main_data[3:]:
+            average_k=d['AVG_K']
+            avg_k_holder.append(average_k)
+
+
+
+        for vg in avg_k_holder:
+            index_finder_=avg_k_holder.index(vg)
+            if index_finder_ not in index_loader_:
+                index_loader_.append(index_finder_)
+
+            if index_finder_ in index_loader_:
+                main_values_=index_loader_[-1]
+                new_values_=main_values_+1
+                index_loader_.append(new_values_)
+            new_length_=len(index_loader_)
+            ranger_datas=index_loader_[0:new_length_-1]
+        for dat in ranger_datas[3:]:
+            da=dat-3
+            dummy_index_.append(da)
+        dummy_index_.reverse()
+        ranger_datas.reverse()
+
+
+        for s,l in zip(dummy_index_,ranger_datas):
+            place_holder_=sum(avg_k_holder[s:l])
+            final_values.append(place_holder_)
+
+
+
+        for p ,averaged_d in enumerate(final_values):
+                main_data[p+3]['D']=averaged_d
+    
+        with open(r"C:\Users\dasho\divergence_test.json",'w') as rr:
+            json.dump(main_data,rr,indent=4)
+
+
+        
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+        
+        
+            
+
+
+
+
+
+
+
+            
+
+
+
+            
         
 
 
