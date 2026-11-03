@@ -34,6 +34,8 @@ class MACD:
         master_high_list=[]
         master_low_list=[]
         master_date_list=[]
+        main_ema=[]
+        master_ema_list=[]
 
 
         main_data=self.getting_the_live_data()
@@ -53,11 +55,34 @@ class MACD:
         last_12=master_close_list[:12]
         initialized_ema=sum(last_12)
         main_data[11]['EMA_12']=initialized_ema
-        with open(r"C:\Users\dasho\divergence_test.json",'r') as x:
+        initialized_ema_value=initialized_ema
+       
+
+        with open(r"C:\Users\dasho\divergence_test.json",'w') as x:
             json.dump(main_data,x,indent=4)
+            for data in main_data:
+                ema_12_data=data['EMA_12']
+                master_ema_list.append(ema_12_data)
+
+
+
+
+            for closings in master_close_list[12:]:
+                for emas in initialized_ema_value:
+                    pass
 
 
             
+
+
+
+
+
+
+
+
+
+
 
 
 
