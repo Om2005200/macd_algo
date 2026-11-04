@@ -73,6 +73,7 @@ class MACD:
         index_loader=[]
         finalized_values=[]
         dummy_index=[]
+        master_date_data=[]
         main_data=self.getting_the_main_data()
         for datas in main_data:
             close_=datas['CLOSE']
@@ -89,6 +90,8 @@ class MACD:
             master_low_list.append(low)
             master_high_list.append(high)
             master_time_list.append(time_)
+            master_date_data.append(date_)
+
 
 
 
@@ -148,7 +151,7 @@ class MACD:
 
         # with open(r"C:\Users\dasho\divergence_test.json",'w') as ll:
         #     json.dump(main_data,ll,indent=4)
-       
+        jjj=[]
         for revised in main_data[25:]:
             current_date=revised['DATE']
             
@@ -159,14 +162,14 @@ class MACD:
 
             macd_line=ema_12-ema_26
             macd_data.append(macd_line)
-           
+
 
 
 
 
         
         for index__ ,his in enumerate(macd_data):
-            main_data[index__+25]['MACD']=his
+            main_data[index__+25]['MACD']=abs(his)
         
         # with open(r"C:\Users\dasho\divergence_test.json",'w') as tt:
         #     json.dump(main_data,tt,indent=4)
@@ -336,7 +339,99 @@ class MACD:
     
         with open(r"C:\Users\dasho\divergence_test.json",'w') as rr:
             json.dump(main_data,rr,indent=4)
+        
+        for current_data in main_data[3:]:
+
+            closing_prices=current_data['CLOSE']
+            opening_prices=current_data['OPEN']
+            time_data=current_data['TIME']
+            date_data=current_data['DATE']
+            k_data=current_data['K']
+            d_data=current_data['D']
+            macd_data_=current_data['MACD']
+            current_closing_price=master_close_list[-1]
+            current_opening_prices=master_open_list[-1]
+            current_time_data=master_time_list[-1]
+            current_dates=master_date_data[-1]
+
             
+            if current_closing_price>current_opening_prices:
+                recent_time_list=[]
+                recent_close_list=[]
+                recent_open_list=[]
+                semi_final_green_candle=[]
+                for green_data in main_data[3:]:
+                    green_close_price=green_data['CLOSE']
+                    green_open_price=green_data['OPEN']
+                    green_dates=green_data['DATE']
+                    green_times=green_data['TIME']
+                    
+                if current_dates==green_dates:
+                    recent_time_list.append(green_times)
+                    recent_close_list.append(green_close_price)
+                    recent_open_list.append(green_open_price)
+
+                if current_time_data==green_times:
+                    #print(green_data)
+                    semi_final_green_candle.append(green_data)
+                for new_candles in semi_final_green_candle:
+                    new_candle_close=new_candles['CLOSE']
+                    new_candle_open=new_candles['OPEN']
+                    macd_value=new_candles['MACD']
+                    k_value=new_candles['K']
+                    d_value=new_candles['D']
+
+                    if new_candle_close>new_candle_open:
+
+
+                        if macd_value>0:
+                            if k_value>d_value:
+                                print(new_candles)
+
+
+
+
+                
+                # green_time_index_finder=recent_time_list.index(current_time_data)
+                # #print(green_time_index_finder)
+                # closing_price_value_finder=recent_close_list[green_time_index_finder]
+                # print(closing_price_value_finder)
+                # open_price_value_finder=recent_open_list[green_time_index_finder]
+
+                # if closing_price_value_finder==current_closing_price:
+                   
+                #     if open_price_value_finder<closing_price_value_finder:
+                #         for candles in semi_final_green_candle:
+                #             print(candles)
+
+
+
+
+                
+
+
+                    
+
+            
+        
+
+
+
+
+
+
+
+
+        # for current_data in main_data(self):
+        #     whole_data=self.getting_the_main_data()
+            
+
+
+
+
+m=MACD()
+m.getting_the_main_data()
+m.analyzing_the_main_data()     
 
 
 
