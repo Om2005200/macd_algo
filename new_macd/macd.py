@@ -33,6 +33,42 @@ class MACD:
 
 
 
+    
+    def opening_the_order_log(self):
+
+        file_path = r"C:\Users\dasho\macd_code_orderbook.json"
+
+        try:
+
+            with open(file_path, "r") as x:
+                data = json.load(x)
+
+            if data is None:
+                data = []
+
+            return data
+
+        except FileNotFoundError:
+
+            #print(f"NO ORDERBOOK FOUND FOR {file_name}. CREATING NEW FILE")
+
+            with open(file_path, "w") as x:
+                json.dump([], x, indent=4)
+
+            return []
+
+        except json.JSONDecodeError:
+
+            #print(f"ORDERBOOK CORRUPTED FOR {file_name}. RESETTING")
+
+            with open(file_path, "w") as x:
+                json.dump([], x, indent=4)
+
+            return []
+
+
+
+
 
 
 
@@ -42,7 +78,13 @@ class MACD:
 
      
 
-    def analyzing_the_main_data(self):
+    def analyzing_the_main_data(self,stock_data:str):
+        stock_list=['macd']
+
+
+
+
+        latest_date="2026-10-28"
         avg_k_holder=[]
         index_loader_=[]
         final_values=[]
@@ -74,7 +116,8 @@ class MACD:
         finalized_values=[]
         dummy_index=[]
         master_date_data=[]
-        main_data=self.getting_the_main_data()
+        main_data,file_name=stock_data
+        order_log=self.opening_the_order_log(file_name)
         for datas in main_data:
             close_=datas['CLOSE']
             open_=datas['OPEN']
@@ -91,6 +134,47 @@ class MACD:
             master_high_list.append(high)
             master_time_list.append(time_)
             master_date_data.append(date_)
+
+        ct_close=master_close_list[-1]
+        ct_open=master_open_list[-1]
+        ct_time=master_time_list[-1]
+        if order_log:
+            for orders in order_log:
+                status=orders['STATUS']
+                if status=='OPEN':
+                    candle=orders['CANDLE']
+                   
+                    #candle_3=orders['CANDLE_3']
+                    candle_1_close=candle['CLOSE']
+                    candle_1_open=candle['OPEN']
+                    candle_1_timing=candle['TIME']
+                    if candle_1_close>candle_1_open:  # IF IT  WAS A BEARISH SETUP MEANS THE GREEN CANDLES
+                        if ct_time>candle_1_timing:
+                            if ct_close<ct_open:
+
+                                orders['STATUS']='CLOSED'
+                                stock_symbol=file_name.replace('_revised_dataset_macd_pro_data.json','').lower()
+                                confirmation_candle = {
+                                    "DATE": current_date,
+                                    "TIME": ct_time,
+                                    "OPEN": ct_open,
+                                    "HIGH": main_data[-1]["HIGH"],
+                                    "LOW": main_data[-1]["LOW"],
+                                    "CLOSE": ct_close
+                                }
+                                orders['STATUS']='CLOSED'
+                                with open(r"C:\Users\dasho\{}macd_orderbook.json".format(file_name),'w') as ki:
+                                    json.dump(order_log,ki,indent=4)
+                                    print('NEXT CANDLE WAS A RED CANDLE')
+
+
+
+
+
+                    
+
+               
+                
 
 
 
@@ -339,91 +423,108 @@ class MACD:
     
         with open(r"C:\Users\dasho\divergence_test.json",'w') as rr:
             json.dump(main_data,rr,indent=4)
-        
+
+
+
+        time_data=[]
+       
         for current_data in main_data[3:]:
+            current_closing_price=current_data['CLOSE']
+            current_opening_price=current_data['OPEN']
+            current_date_data=current_data['DATE']
+            current_time_data=current_data['TIME']
+            if latest_date==current_date_data:
+                time_data.append(current_time_data)
 
-            closing_prices=current_data['CLOSE']
-            opening_prices=current_data['OPEN']
-            time_data=current_data['TIME']
-            date_data=current_data['DATE']
-            k_data=current_data['K']
-            d_data=current_data['D']
-            macd_data_=current_data['MACD']
-            current_closing_price=master_close_list[-1]
-            current_opening_prices=master_open_list[-1]
-            current_time_data=master_time_list[-1]
-            current_dates=master_date_data[-1]
-
-            
-            if current_closing_price>current_opening_prices:
-                recent_time_list=[]
-                recent_close_list=[]
-                recent_open_list=[]
-                semi_final_green_candle=[]
-                for green_data in main_data[3:]:
-                    green_close_price=green_data['CLOSE']
-                    green_open_price=green_data['OPEN']
-                    green_dates=green_data['DATE']
-                    green_times=green_data['TIME']
-                    
-                if current_dates==green_dates:
-                    recent_time_list.append(green_times)
-                    recent_close_list.append(green_close_price)
-                    recent_open_list.append(green_open_price)
-
-                if current_time_data==green_times:
-                    #print(green_data)
-                    semi_final_green_candle.append(green_data)
-                for new_candles in semi_final_green_candle:
-                    new_candle_close=new_candles['CLOSE']
-                    new_candle_open=new_candles['OPEN']
-                    macd_value=new_candles['MACD']
-                    k_value=new_candles['K']
-                    d_value=new_candles['D']
-
-                    if new_candle_close>new_candle_open:
+                current_close=master_close_list[-1]
+                current_open=master_open_list[-1]
+                current_time=master_time_list[-1]
+                #print(current_time)
+                if current_close>current_open:
+                    finalized_green_candle=[]
+                    for green_data in main_data:
+                        green_close_price=green_data['CLOSE']
+                        green_open_price=green_data['OPEN']
+                        green_date=green_data['DATE']
+                        green_time=green_data['TIME']
+                        if latest_date==green_date:
+                            if current_close>current_open:
+                                if green_time==current_time:
+                                    finalized_green_candle.append(green_data)
 
 
-                        if macd_value>0:
+                    if finalized_green_candle:
+                        for candles in finalized_green_candle:
+                            candle_close=candles['CLOSE']
+                            candle_open=candles['OPEN']
+                            macd=candles['MACD']
+                            k_value=candles['K']
+                            d_value=candles['D']
+
+
+
+                        if macd>0:
                             if k_value>d_value:
-                                print(new_candles)
+                                new_setup={
+                                    'STATUS':'OPEN',
+                                    'CANDLE':candles
+                                }
+                                if new_setup not in order_log:
+                                    order_log.append(new_setup)
+                                    with open(r"C:\Users\dasho\macd_code_orderbook.json",'w') as code:
+                                        json.dump(order_log,code,indent=4)
+                                        
 
+
+                                    print(order_log)
+
+                #finalizd_red_candle=[]
+                elif current_close<current_open:
+                    finalized_red_candle=[]
+                    for red_candles in main_data:
+                        red_candle_close=red_candles['CLOSE']
+                        red_candle_open=red_candles['OPEN']
+                        red_candle_dates=red_candles['DATE']
+                        red_candle_times=red_candles['TIME']
+                        if latest_date==red_candle_dates:
+                            if red_candle_times==current_time:
+
+                                if current_close<current_open:
+                                    finalized_red_candle.append(red_candles)
+                    if finalized_red_candle:
+                        for reds in finalized_red_candle:
+                            red_k=reds['K']
+                            red_d=reds['D']
+                            red_macd=reds['MACD']
+                        if red_macd>0:
+                            if red_k>red_d:
+                                new_setup={
+                                    'STATUS':'OPEN',
+                                    'CANDLE':reds
+                                }
+                                print(new_setup)
+
+
+                                if new_setup not in order_log:
+                                    order_log.append(new_setup)
+
+                                    with open(r"C:\Users\dasho\macd_code_orderbook.json",'w') as lx:
+                                        json.dump(order_log,lx,indent=4)
 
 
 
                 
-                # green_time_index_finder=recent_time_list.index(current_time_data)
-                # #print(green_time_index_finder)
-                # closing_price_value_finder=recent_close_list[green_time_index_finder]
-                # print(closing_price_value_finder)
-                # open_price_value_finder=recent_open_list[green_time_index_finder]
-
-                # if closing_price_value_finder==current_closing_price:
-                   
-                #     if open_price_value_finder<closing_price_value_finder:
-                #         for candles in semi_final_green_candle:
-                #             print(candles)
 
 
+
+
+                                    
 
 
                 
 
 
-                    
 
-            
-        
-
-
-
-
-
-
-
-
-        # for current_data in main_data(self):
-        #     whole_data=self.getting_the_main_data()
             
 
 
