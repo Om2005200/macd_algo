@@ -5,9 +5,10 @@ import json
 from datetime import datetime
 import time 
 
+import textwrap
+from  concurrent.futures import ProcessPoolExecutor
 
-
-
+import asyncio
 
 class MACD:
 
@@ -17,26 +18,31 @@ class MACD:
 
 
     def __init__(self):
-        pass
+        self.authentication_token=''
 
 
 
 
     
-    def getting_the_main_data(self):
-        with open(r"C:\Users\dasho\divergence_test.json",'r') as xv:
-            data=json.load(xv)
+    
+    def opening_the_rsi_raw_data(self):
+        file_list = ["abb_revised_dataset_rsi_pro_data.json", "adaniensol_revised_dataset_rsi_pro_data.json", "adanient_revised_dataset_rsi_pro_data.json", "adanigreen_revised_dataset_rsi_pro_data.json", "adaniports_revised_dataset_rsi_pro_data.json", "adanipower_revised_dataset_rsi_pro_data.json", "ambujacem_revised_dataset_rsi_pro_data.json", "apollohosp_revised_dataset_rsi_pro_data.json", "asianpaint_revised_dataset_rsi_pro_data.json", "dmart_revised_dataset_rsi_pro_data.json", "axisbank_revised_dataset_rsi_pro_data.json", "bajaj-auto_revised_dataset_rsi_pro_data.json", "bajfinance_revised_dataset_rsi_pro_data.json", "bajajfinsv_revised_dataset_rsi_pro_data.json", "bajajhldng_revised_dataset_rsi_pro_data.json", "bankbaroda_revised_dataset_rsi_pro_data.json", "bel_revised_dataset_rsi_pro_data.json", "bpcl_revised_dataset_rsi_pro_data.json", "bhartiartl_revised_dataset_rsi_pro_data.json", "boschltd_revised_dataset_rsi_pro_data.json", "britannia_revised_dataset_rsi_pro_data.json", "cgpower_revised_dataset_rsi_pro_data.json", "canbk_revised_dataset_rsi_pro_data.json", "cholafin_revised_dataset_rsi_pro_data.json", "cipla_revised_dataset_rsi_pro_data.json", "coalindia_revised_dataset_rsi_pro_data.json", "cumminsind_revised_dataset_rsi_pro_data.json", "dlf_revised_dataset_rsi_pro_data.json", "divislab_revised_dataset_rsi_pro_data.json", "drreddy_revised_dataset_rsi_pro_data.json", "eichermot_revised_dataset_rsi_pro_data.json", "eternal_revised_dataset_rsi_pro_data.json", "gail_revised_dataset_rsi_pro_data.json", "godrejcp_revised_dataset_rsi_pro_data.json", "grasim_revised_dataset_rsi_pro_data.json", "hcltech_revised_dataset_rsi_pro_data.json", "hdfcamc_revised_dataset_rsi_pro_data.json", "hdfcbank_revised_dataset_rsi_pro_data.json", "hdfclife_revised_dataset_rsi_pro_data.json", "hindalco_revised_dataset_rsi_pro_data.json", "hal_revised_dataset_rsi_pro_data.json", "hindunilvr_revised_dataset_rsi_pro_data.json", "hindzinc_revised_dataset_rsi_pro_data.json", "hyundai_revised_dataset_rsi_pro_data.json", "icicibank_revised_dataset_rsi_pro_data.json", "itc_revised_dataset_rsi_pro_data.json", "indhotel_revised_dataset_rsi_pro_data.json", "ioc_revised_dataset_rsi_pro_data.json", "irfc_revised_dataset_rsi_pro_data.json", "infy_revised_dataset_rsi_pro_data.json", "indigo_revised_dataset_rsi_pro_data.json", "jswsteel_revised_dataset_rsi_pro_data.json", "jindalstel_revised_dataset_rsi_pro_data.json", "jiofin_revised_dataset_rsi_pro_data.json", "kotakbank_revised_dataset_rsi_pro_data.json", "ltm_revised_dataset_rsi_pro_data.json", "lt_revised_dataset_rsi_pro_data.json", "lodha_revised_dataset_rsi_pro_data.json", "m&m_revised_dataset_rsi_pro_data.json", "maruti_revised_dataset_rsi_pro_data.json", "maxhealth_revised_dataset_rsi_pro_data.json", "mazdock_revised_dataset_rsi_pro_data.json", "muthootfin_revised_dataset_rsi_pro_data.json", "ntpc_revised_dataset_rsi_pro_data.json", "nestleind_revised_dataset_rsi_pro_data.json", "ongc_revised_dataset_rsi_pro_data.json", "pidilitind_revised_dataset_rsi_pro_data.json", "pfc_revised_dataset_rsi_pro_data.json", "powergrid_revised_dataset_rsi_pro_data.json", "pnb_revised_dataset_rsi_pro_data.json", "recltd_revised_dataset_rsi_pro_data.json", "reliance_revised_dataset_rsi_pro_data.json", "sbilife_revised_dataset_rsi_pro_data.json", "motherson_revised_dataset_rsi_pro_data.json", "shreecem_revised_dataset_rsi_pro_data.json", "shriramfin_revised_dataset_rsi_pro_data.json", "enrin_revised_dataset_rsi_pro_data.json", "siemens_revised_dataset_rsi_pro_data.json", "solarinds_revised_dataset_rsi_pro_data.json", "sbin_revised_dataset_rsi_pro_data.json", "sunpharma_revised_dataset_rsi_pro_data.json", "tvsmotor_revised_dataset_rsi_pro_data.json", "tatacap_revised_dataset_rsi_pro_data.json", "tcs_revised_dataset_rsi_pro_data.json", "tataconsum_revised_dataset_rsi_pro_data.json", "tmcv_revised_dataset_rsi_pro_data.json", "tmpv_revised_dataset_rsi_pro_data.json", "tatapower_revised_dataset_rsi_pro_data.json", "tatasteel_revised_dataset_rsi_pro_data.json", "techm_revised_dataset_rsi_pro_data.json", "titan_revised_dataset_rsi_pro_data.json", "torntpharm_revised_dataset_rsi_pro_data.json", "trent_revised_dataset_rsi_pro_data.json", "ultracemco_revised_dataset_rsi_pro_data.json", "unionbank_revised_dataset_rsi_pro_data.json", "unitdspr_revised_dataset_rsi_pro_data.json", "vbl_revised_dataset_rsi_pro_data.json", "vedl_revised_dataset_rsi_pro_data.json", "wipro_revised_dataset_rsi_pro_data.json", "zyduslife_revised_dataset_rsi_pro_data.json"]
+       
+        all_data=[]
+        for files in file_list:
+            with open(r"C:\Users\dasho\{}".format(files),'r') as k:
+                data=json.load(k)
+            all_data.append((data,files))
 
-
-        return data
-
+        return all_data
 
 
 
     
-    def opening_the_order_log(self):
+    def opening_the_order_log(self,file_name):
 
-        file_path = r"C:\Users\dasho\macd_code_orderbook.json"
+        file_path = r"C:\Users\dasho\{}macd_code_orderbook.json".format(file_name)
+
 
         try:
 
@@ -80,6 +86,8 @@ class MACD:
 
     def analyzing_the_main_data(self,stock_data:str):
         stock_list=['macd']
+        new_orders=None
+
 
 
 
@@ -162,10 +170,70 @@ class MACD:
                                     "LOW": main_data[-1]["LOW"],
                                     "CLOSE": ct_close
                                 }
-                                orders['STATUS']='CLOSED'
+                                 
+                                chat_ids=["7488782309","631370077"]
+                                url=(
+                                    f"https://api.telegram.org/bot"
+                                    f"{self.authentication_token}/sendMessage"
+                                )
+
                                 with open(r"C:\Users\dasho\{}macd_orderbook.json".format(file_name),'w') as ki:
                                     json.dump(order_log,ki,indent=4)
                                     print('NEXT CANDLE WAS A RED CANDLE')
+                                    bullish_message = textwrap.dedent(f"""\
+                                    🚨 BEARISH DIVERGENCE DETECTED
+                                    ━━━━━━━━━━━━━━━━━━━━━━
+
+                                    📊 Instrument : {stock_symbol.upper()}
+                                    ⏱️ Timeframe : 5 Minutes
+
+                                    📈 First High
+                                    🕒 Time : {candle['TIME']}
+                                    💰 Close : {candle['CLOSE']:.2f}
+                                    """)
+                            elif ct_close>ct_open:
+                                orders['STATUS']='CLOSED'
+                                with open(r"C:\Users\dasho\{}macd_orderbook.json".format(file_name),'w') as fr:
+                                    json.dump(order_log,fr,indent=4)
+                    elif candle_1_close<candle_1_open:  # IF IT  WAS A BEARISH SETUP MEANS THE GREEN CANDLES
+                        if ct_time>candle_1_timing:
+                            if ct_close>ct_open:
+
+                                orders['STATUS']='CLOSED'
+                                stock_symbol=file_name.replace('_revised_dataset_macd_pro_data.json','').lower()
+                                confirmation_candle = {
+                                    "DATE": current_date,
+                                    "TIME": ct_time,
+                                    "OPEN": ct_open,
+                                    "HIGH": main_data[-1]["HIGH"],
+                                    "LOW": main_data[-1]["LOW"],
+                                    "CLOSE": ct_close
+                                }
+                                    
+                                chat_ids=["7488782309","631370077"]
+                                url=(
+                                    f"https://api.telegram.org/bot"
+                                    f"{self.authentication_token}/sendMessage"
+                                )
+
+                                with open(r"C:\Users\dasho\{}macd_orderbook.json".format(file_name),'w') as ki:
+                                    json.dump(order_log,ki,indent=4)
+                                    print('NEXT CANDLE WAS A RED CANDLE')
+                                    bearish_message = textwrap.dedent(f"""\
+                                    🚨 BEARISH DIVERGENCE DETECTED
+                                    ━━━━━━━━━━━━━━━━━━━━━━
+
+                                    📊 Instrument : {stock_symbol.upper()}
+                                    ⏱️ Timeframe : 5 Minutes
+
+                                    📈 First High
+                                    🕒 Time : {candle['TIME']}
+                                    💰 Close : {candle['CLOSE']:.2f}
+                                    """)
+                            elif ct_close<ct_open:
+                                orders['STATUS']='CLOSED'
+                                with open(r"C:\Users\dasho\{}macd_orderbook.json".format(file_name),'w') as fr:
+                                    json.dump(order_log,fr,indent=4)                 
 
 
 
@@ -471,7 +539,7 @@ class MACD:
                                 }
                                 if new_setup not in order_log:
                                     order_log.append(new_setup)
-                                    with open(r"C:\Users\dasho\macd_code_orderbook.json",'w') as code:
+                                    with open(r"C:\Users\dasho\{}macd_code_orderbook.json".format(file_name),'w') as code:
                                         json.dump(order_log,code,indent=4)
                                         
 
@@ -508,8 +576,40 @@ class MACD:
                                 if new_setup not in order_log:
                                     order_log.append(new_setup)
 
-                                    with open(r"C:\Users\dasho\macd_code_orderbook.json",'w') as lx:
+                                    with open(r"C:\Users\dasho\{}macd_code_orderbook.json".format(file_name),'w') as lx:
                                         json.dump(order_log,lx,indent=4)
+
+    
+
+    async def running_the_threads(self):
+        loop=asyncio.get_running_loop()
+        #main_data_=self.taking_the_positions()
+        feeder=self.opening_the_rsi_raw_data()
+        data_list=[]
+        with ProcessPoolExecutor() as exter:
+            for datas in feeder:
+                main_data=loop.run_in_executor(exter,self.analyzing_the_main_data,datas)
+                data_list.append(main_data)
+
+
+            for tre in data_list:
+                await tre
+
+
+async def main_runner():
+    n=MACD()
+    while True:
+        print('STARTING THE CYCLE')
+        await n.running_the_threads()
+        print('NEXT CYCLE TO BE STARTED AFTER 5  MINS')
+
+
+        await asyncio.sleep(300)
+
+
+
+if __name__=="__main__":
+    asyncio.run(main_runner())
 
 
 
